@@ -1,0 +1,11 @@
+{
+  "id": 95396,
+  "name": "Severance",
+  "first_air_date": "2022-02-18",
+  "seasons": [
+    {"season_number": 0, "air_date": "2022-03-25", "name": "Specials"},
+    {"season_number": 1, "air_date": "2022-02-18", "name": "Season 1"},
+    {"season_number": 2, "air_date": "2025-01-17", "name": "Season 2"},
+    {"season_number": 3, "air_date": null, "name": "Season 3"}
+  ]
+}
