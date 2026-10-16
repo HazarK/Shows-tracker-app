@@ -1,0 +1,9 @@
+project_id = "tvtracker"
+
+# Telegram and the daily cron do not send a Supabase user JWT.
+# Each function checks its own shared secret.
+[functions.telegram-webhook]
+verify_jwt = false
+
+[functions.check-seasons]
+verify_jwt = false
