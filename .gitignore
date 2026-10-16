@@ -4,7 +4,9 @@ __pycache__/
 .mypy_cache/
 *.egg-info/
 .env
+.env.*
 data/
+node_modules/
 supabase/.temp/
 supabase/.branches/
 *.sqlite
