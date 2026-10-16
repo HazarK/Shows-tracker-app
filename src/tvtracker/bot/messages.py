@@ -41,6 +41,11 @@ def found_prompt(title: str, year: int | None) -> str:
     return f"I found <b>{shown}</b>. Is this the show you want to follow?"
 
 
+def remove_prompt(title: str, year: int | None) -> str:
+    shown = escape_html(format_show(title, year))
+    return f"Stop following <b>{shown}</b>?"
+
+
 def not_found_message(query: str) -> str:
     return (
         f"I couldn't find a show matching <b>{escape_html(query)}</b>. Try another title."

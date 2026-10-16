@@ -25,6 +25,7 @@ from tvtracker.bot.messages import (
     found_prompt,
     new_season_message,
     not_found_message,
+    remove_prompt,
 )
 from tvtracker.config import load_config
 from tvtracker.db.repository import Repository
@@ -63,6 +64,7 @@ def test_prd_copy():
     assert found_prompt("Severance", 2022) == (
         "I found <b>Severance (2022)</b>. Is this the show you want to follow?"
     )
+    assert remove_prompt("Tulsa King", 2022) == "Stop following <b>Tulsa King (2022)</b>?"
     assert not_found_message("A & B <show>") == (
         "I couldn't find a show matching <b>A &amp; B &lt;show&gt;</b>. Try another title."
     )
@@ -245,8 +247,8 @@ def test_cancel(repo):
     )
 
 
-def test_remove_unique_substring_and_missing(repo):
-    repo.add_tracked_show(
+def test_remove_unique_substring_asks_before_deleting(repo):
+    show = repo.add_tracked_show(
         CHAT, tmdb_id=1, title="Severance", first_air_year=2022, baseline_seasons=[]
     )
     tmdb = FakeTmdb()
@@ -254,9 +256,29 @@ def test_remove_unique_substring_and_missing(repo):
     add_show(CHAT, "Other", tmdb=tmdb, repo=repo, now=NOW)
     assert repo.get_pending_choice(CHAT, NOW) is not None
 
-    removed = remove_show(CHAT, "sev", repo=repo, now=NOW)
+    asked = remove_show(CHAT, "sev", repo=repo, now=NOW)
 
-    assert removed.text == "Stopped following Severance (2022)."
+    assert asked.text == remove_prompt("Severance", 2022)
+    assert asked.parse_mode == "HTML"
+    assert asked.buttons == (
+        (Button("Confirm", f"rm:{show.id}"), Button("Cancel", "rm:cancel")),
+    )
+    assert [item.title for item in repo.list_tracked_shows(CHAT)] == ["Severance"]
+    pending = repo.get_pending_choice(CHAT, NOW)
+    assert pending is not None
+    assert pending.action == "remove"
+
+    cancelled = handle_callback(
+        CHAT, "rm:cancel", tmdb=tmdb, repo=repo, today=TODAY, now=NOW
+    )
+    assert cancelled.text == "Cancelled."
+    assert [item.title for item in repo.list_tracked_shows(CHAT)] == ["Severance"]
+
+    remove_show(CHAT, "sev", repo=repo, now=NOW)
+    confirmed = handle_callback(
+        CHAT, f"rm:{show.id}", tmdb=tmdb, repo=repo, today=TODAY, now=NOW
+    )
+    assert confirmed.text == "Stopped following Severance (2022)."
     assert repo.list_tracked_shows(CHAT) == []
     assert repo.get_pending_choice(CHAT, NOW) is None
     assert (

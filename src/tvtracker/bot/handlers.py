@@ -26,6 +26,7 @@ from tvtracker.bot.messages import (
     format_show,
     found_prompt,
     not_found_message,
+    remove_prompt,
 )
 from tvtracker.config import Config
 from tvtracker.db.repository import AlreadyTracking, PendingChoice, Repository
@@ -154,8 +155,22 @@ def remove_show(
         return Outgoing(f"You're not following a show matching {title_query}.")
     if len(matches) == 1:
         show = matches[0]
-        repo.remove_tracked_show(chat_id, show.id)
-        return Outgoing(f"Stopped following {format_show(show.title, show.first_air_year)}.")
+        repo.set_pending_choice(
+            chat_id,
+            "remove",
+            {"show_ids": [show.id]},
+            now + PENDING_TTL,
+        )
+        return Outgoing(
+            remove_prompt(show.title, show.first_air_year),
+            buttons=(
+                (
+                    Button("Confirm", f"rm:{show.id}"),
+                    Button("Cancel", "rm:cancel"),
+                ),
+            ),
+            parse_mode="HTML",
+        )
 
     repo.set_pending_choice(
         chat_id,

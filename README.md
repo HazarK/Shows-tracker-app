@@ -50,7 +50,7 @@ Use this locally instead of waiting for `CHECK_HOUR`. If nobody is following a s
 
 - `/add <show name>` — search TMDB and confirm the match on inline buttons
 - `/list` — show the shows you follow
-- `/remove <show name>` — stop following a show (asks you to pick if several titles match)
+- `/remove <show name>` — stop following a show after you confirm the match (asks you to pick if several titles match)
 - `/cancel` — dismiss the current choice
 - `/help` — show the commands
 
