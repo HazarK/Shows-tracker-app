@@ -14,6 +14,7 @@ from tvtracker.bot.notifier import TelegramNotifier
 from tvtracker.config import ConfigError, load_config
 from tvtracker.db.repository import Repository
 from tvtracker.domain.seasons import newly_released
+from tvtracker.runtime import configure_logging
 from tvtracker.tmdb.client import ShowDetails, TmdbClient
 
 logger = logging.getLogger(__name__)
@@ -102,12 +103,7 @@ def check_all(
 
 
 def main() -> None:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(name)s %(message)s",
-    )
-    logging.getLogger("httpx").setLevel(logging.WARNING)
-    logging.getLogger("httpcore").setLevel(logging.WARNING)
+    configure_logging()
     load_dotenv()
     try:
         config = load_config()

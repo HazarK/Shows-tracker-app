@@ -30,8 +30,10 @@ To lock the bot to yourself, send `/start`, read `start chat_id=...` in the proc
 
 ## Run the bot
 
+Use the virtualenv interpreter. On this Mac, `python` is Python 3.10 and skips the virtualenv even after `source .venv/bin/activate`.
+
 ```bash
-python -m tvtracker
+.venv/bin/python -m tvtracker
 ```
 
 The process long-polls Telegram, so it does not need a public URL. Leave it running. The daily season check runs in this same process at `CHECK_HOUR`. If the process is stopped at that hour, that day's check waits until the next day. Use the one-shot command below to run it immediately.
@@ -39,7 +41,7 @@ The process long-polls Telegram, so it does not need a public URL. Leave it runn
 ## Run the season check once
 
 ```bash
-python -m tvtracker.jobs.check_seasons
+.venv/bin/python -m tvtracker.jobs.check_seasons
 ```
 
 Use this locally instead of waiting for `CHECK_HOUR`. If nobody is following a show, the command exits without calling TMDB.
@@ -57,10 +59,17 @@ A choice expires after 15 minutes. `/add` and `/remove` replace any choice that 
 ## Tests
 
 ```bash
-pytest
+.venv/bin/pytest
 ```
 
 Tests use a temporary SQLite file, recorded TMDB JSON fixtures, and fakes for Telegram. They do not call the network.
+
+This clone runs those tests before each commit. On a new clone, install the hook once:
+
+```bash
+cp .githooks/pre-commit .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit scripts/check-git-root.sh
+```
 
 ## How a season is alerted once
 
